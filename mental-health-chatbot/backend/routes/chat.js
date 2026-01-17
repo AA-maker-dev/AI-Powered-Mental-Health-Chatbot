@@ -3,7 +3,7 @@ const router = express.Router();
 const chatbot = require('../utils/chatbot');
 
 // Main chat endpoint
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { message } = req.body;
     
@@ -11,7 +11,7 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const reply = chatbot.getResponse(message);
+    const reply = await chatbot.getResponse(message);
     
     res.json({
       message: message,

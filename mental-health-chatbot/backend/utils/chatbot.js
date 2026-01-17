@@ -1,4 +1,23 @@
-// Simple NLP-based chatbot with pattern matching
+// AI-powered chatbot using OpenAI's API (or Anthropic Claude)
+const { Anthropic } = require('@anthropic-ai/sdk');
+
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY
+});
+
+const systemPrompt = `You are MindCare, a compassionate and supportive mental health chatbot. Your role is to:
+- Listen actively and empathetically to users
+- Provide supportive and non-judgmental responses
+- Offer coping strategies and mental health tips
+- Recognize emergency situations and direct users to professional help
+- Keep responses concise (2-3 sentences typically)
+- Never pretend to be a licensed therapist
+- Encourage professional help when needed
+- Support users in their mental health journey
+
+Always prioritize user safety and well-being.`;
+
+// Fallback responses for errors
 const responses = {
   greetings: {
     patterns: ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening'],
@@ -116,6 +135,31 @@ function findMatchingResponse(message) {
   return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
 }
 
+// AI-powered response using Claude (Recommended)
+async function getAIResponse(message) {
+  try {
+    const response = await client.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: message
+        }
+      ]
+    });
+    
+    return response.content[0].text;
+  } catch (error) {
+    console.error('AI API Error:', error);
+    // Fallback to pattern matching if AI fails
+    return findMatchingResponse(message);
+  }
+}
+
+// Export both functions - use getAIResponse for actual AI
 module.exports = {
-  getResponse: findMatchingResponse
+  getResponse: getAIResponse,
+  getResponseFallback: findMatchingResponse
 };
