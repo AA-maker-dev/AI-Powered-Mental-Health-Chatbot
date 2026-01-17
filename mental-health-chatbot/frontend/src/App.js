@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import ChatBubble from './components/ChatBubble';
 
 function App() {
   const [input, setInput] = useState('');
