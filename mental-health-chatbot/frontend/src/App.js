@@ -1,37 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import ChatBubble from './components/ChatBubble';
+import ChatWindow from './components/ChatWindow';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
 
 function App() {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [activeTab, setActiveTab] = useState('chat');
+  const [userMood, setUserMood] = useState(null);
+  const [moodHistory, setMoodHistory] = useState([]);
 
-  const handleSend = () => {
-    setMessages([...messages, { text: input, sender: 'user' }]);
-    // Simulate bot response
-    setTimeout(() => {
-      setMessages((prevMessages) => [...prevMessages, { text: 'Bot response to: ' + input, sender: 'bot' }]);
-    }, 1000);
-    setInput('');
+  useEffect(() => {
+    // Load mood history from localStorage
+    const savedMoodHistory = localStorage.getItem('moodHistory');
+    if (savedMoodHistory) {
+      setMoodHistory(JSON.parse(savedMoodHistory));
+    }
+  }, []);
+
+  const handleMoodUpdate = (mood) => {
+    setUserMood(mood);
+    const newMoodEntry = {
+      mood,
+      timestamp: new Date().toISOString()
+    };
+    const updatedHistory = [...moodHistory, newMoodEntry];
+    setMoodHistory(updatedHistory);
+    localStorage.setItem('moodHistory', JSON.stringify(updatedHistory));
   };
 
   return (
     <div className="App">
-      <h1>Mental Health Chatbot</h1>
-      <div className="chat-window">
-        {messages.map((msg, index) => (
-          <div key={index} className={msg.sender}>
-            {msg.text}
-          </div>
-        ))}
+      <Header />
+      <div className="main-container">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <ChatWindow 
+          activeTab={activeTab} 
+          userMood={userMood} 
+          onMoodUpdate={handleMoodUpdate}
+          moodHistory={moodHistory}
+        />
       </div>
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Type your message..."
-      />
-      <button onClick={handleSend}>Send</button>
     </div>
   );
 }
