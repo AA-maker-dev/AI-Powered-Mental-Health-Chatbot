@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"d:\\\\Hackathon\\\\Hackathon#3\\\\mental-health-chatbot\\\\backend\" ; npm install$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
