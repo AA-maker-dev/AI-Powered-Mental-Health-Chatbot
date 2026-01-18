@@ -121,3 +121,116 @@
     font-size: 24px;
   }
 }
+
+/* AI Recommendation Section */
+.ai-recommendation-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  color: white;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ai-recommendation-section h3 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.ai-recommendation-section > p {
+  margin-bottom: 20px;
+  opacity: 0.95;
+  font-size: 15px;
+}
+
+.ai-search-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ai-search-box input {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+}
+
+.ai-search-box input::placeholder {
+  color: #999;
+}
+
+.ai-search-box button {
+  padding: 14px 28px;
+  border-radius: 10px;
+  border: 2px solid white;
+  background: transparent;
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.ai-search-box button:hover:not(:disabled) {
+  background: white;
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+.ai-search-box button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ai-recommendation-result {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: start;
+  animation: fadeIn 0.5s ease;
+}
+
+.recommendation-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.ai-recommendation-result p {
+  color: white;
+  line-height: 1.7;
+  font-size: 15px;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .ai-search-box {
+    flex-direction: column;
+  }
+
+  .ai-recommendation-section {
+    padding: 20px;
+  }
+}
