@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
+
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const MODEL = process.env.OLLAMA_MODEL || 'mistral';
 
 const resources = [
   {
@@ -76,6 +80,49 @@ router.get('/:id', (req, res) => {
   }
 
   res.json(resource);
+});
+
+// AI-powered personalized resource recommendations
+router.post('/personalized', async (req, res) => {
+  try {
+    const { topic, mood, concern } = req.body;
+    
+    if (!topic && !mood && !concern) {
+      return res.status(400).json({ error: 'Please provide at least one of: topic, mood, or concern' });
+    }
+
+    const prompt = `As a mental health resource expert, provide a brief, helpful recommendation for someone who is ${mood ? `feeling ${mood}` : ''} ${concern ? `concerned about ${concern}` : ''} ${topic ? `interested in learning about ${topic}` : ''}. 
+
+Provide:
+1. A supportive opening statement (1 sentence)
+2. One specific actionable tip or technique they can try right now
+3. Why this helps (1 sentence)
+
+Keep it concise and encouraging. Format as plain text, no bullet points.`;
+
+    const response = await axios.post(`${OLLAMA_URL}/api/generate`, {
+      model: MODEL,
+      prompt: prompt,
+      stream: false,
+      options: {
+        temperature: 0.7,
+        num_predict: 200
+      }
+    });
+
+    res.json({
+      recommendation: response.data.response.trim(),
+      matchedResources: resources.filter(r => {
+        const searchTerm = (topic || mood || concern || '').toLowerCase();
+        return r.title.toLowerCase().includes(searchTerm) || 
+               r.description.toLowerCase().includes(searchTerm) ||
+               r.category.toLowerCase().includes(searchTerm);
+      }).slice(0, 3)
+    });
+  } catch (error) {
+    console.error('AI Recommendation Error:', error);
+    res.status(500).json({ error: 'Unable to generate recommendation' });
+  }
 });
 
 module.exports = router;
