@@ -1,9 +1,8 @@
-// AI-powered chatbot using OpenAI's API (or Anthropic Claude)
-const { Anthropic } = require('@anthropic-ai/sdk');
+// AI-powered chatbot using Ollama (Local AI - No API keys needed!)
+const axios = require('axios');
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY
-});
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const MODEL = process.env.OLLAMA_MODEL || 'mistral';
 
 const systemPrompt = `You are MindCare, a compassionate and supportive mental health chatbot. Your role is to:
 - Listen actively and empathetically to users
@@ -135,25 +134,23 @@ function findMatchingResponse(message) {
   return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
 }
 
-// AI-powered response using Claude (Recommended)
+// AI-powered response using Ollama (Local AI running on your machine)
 async function getAIResponse(message) {
   try {
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: message
-        }
-      ]
+    const response = await axios.post(`${OLLAMA_URL}/api/generate`, {
+      model: MODEL,
+      prompt: `${systemPrompt}\n\nUser: ${message}\n\nMindCare:`,
+      stream: false,
+      options: {
+        temperature: 0.7,
+        num_predict: 250
+      }
     });
     
-    return response.content[0].text;
+    return response.data.response.trim();
   } catch (error) {
-    console.error('AI API Error:', error);
-    // Fallback to pattern matching if AI fails
+    console.error('Ollama Error:', error.message);
+    // Fallback to pattern matching if Ollama fails
     return findMatchingResponse(message);
   }
 }
